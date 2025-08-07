@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiteLife-My Saved Tips</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>📌My Saved Tips</h1>
+        <a href="index.html">⬅Back to Home</a>
+    </header>
+    <main id="savedTipsContainer">
+        <!--Saved tips will appear here-->
+    </main>
+    <hr style="margin: 40px 0;" />
+
+<h3>🧠 Choose Your Favorite Health Categories</h3>
+
+<div class="category-list" id="categoryList" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px;"></div>
+
+<button onclick="saveFavorites()" style="margin-top: 20px; padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 8px; font-size: 16px;">
+  💾 Save My Interests
+</button>
+    <script src="data.js"></script>
+    <script>
+        const savedTipsContainer=document.getElementById("savedTipsContainer");
+        const savedIds=JSON.parse(localStorage.getItem("savedTips")) || [];
+        const savedTips=healthTips.filter(tip=>savedIds.includes(tip.id));
+        if(savedTips.length===0){
+            savedTipsContainer.innerHTML="<p style='text-align:center;'>No saved tips yet.</p>";
+        } else{
+            savedTips.forEach(tip=>{
+                const card=document.createElement("div");
+                card.className="card";
+                const title=document.createElement("h2");
+                title.textContent=tip.title;
+                const content=document.createElement("p");
+                content.textContent=tip.content;
+                card.appendChild(title);
+                card.appendChild(content);
+                savedTipsContainer.appendChild(card);
+            });
+        }
+    </script>
+    <script>
+const categories = [
+  "First Aid", "Nutrition", "Mental Health", "Pregnancy", "Wellness", "Exercise",
+  "Hygiene", "Stress", "Sleep", "Women's Health", "Men's Health", "Disease Prevention"
+];
+
+const categoryList = document.getElementById("categoryList");
+const savedFavorites = JSON.parse(localStorage.getItem("favoriteCategories")) || [];
+
+categories.forEach(cat => {
+  const div = document.createElement("div");
+  div.className = "category-item";
+  div.textContent = cat;
+  div.style.padding = "10px 18px";
+  div.style.borderRadius = "8px";
+  div.style.background = savedFavorites.includes(cat) ? "#2ecc71" : "#f4f4f4";
+  div.style.cursor = "pointer";
+  div.style.transition = "0.2s";
+  div.style.userSelect = "none";
+  div.style.color = savedFavorites.includes(cat) ? "white" : "#333";
+  div.style.border = "1px solid #ccc";
+
+  div.addEventListener("click", () => {
+    const selected = div.classList.toggle("selected");
+    div.style.background = selected ? "#2ecc71" : "#f4f4f4";
+    div.style.color = selected ? "white" : "#333";
+  });
+
+  if (savedFavorites.includes(cat)) {
+    div.classList.add("selected");
+  }
+
+  categoryList.appendChild(div);
+});
+
+function saveFavorites() {
+  const selected = Array.from(document.querySelectorAll(".category-item.selected")).map(el => el.textContent);
+  localStorage.setItem("favoriteCategories", JSON.stringify(selected));
+  alert("✅ Your favorite categories are saved!");
+}
+</script>
+<script src="themeManager.js"></script>
+</body>
+</html>

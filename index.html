@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiteLife- Life Tips Anytime</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if('serviceWorker'in navigator){
+            window.addEventListener('load',()=>{
+            navigator.serviceWorker.register('serviceWorker.js')
+            .then(()=> console.log("✅ SW registered"))
+            .catch(err=> console.log("SW failed",err));
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+   <!-- Motivational Banner -->
+<div id="motivationBanner" class="banner" data-category="mindset,nutrition,fitness,default">
+  <p id="motivationText">Loading motivation...</p>
+</div>
+</head>
+<body>
+    <header>
+      <div style="text-align: center; margin: 10px 0;">
+  <button id="themeToggle" style="padding: 10px 20px; border-radius: 8px;">🌗 Toggle Mode</button>
+</div>
+        <h1>LiteLife</h1>
+        <input type="text" id="searchInput"
+        placeholder="Search tips...">
+      
+        <div id="premiumNotice" style="display:none; background: #fff0f0; color: #e53935; font-weight: bold; padding: 10px; border-radius: 8px; margin: 10px; text-align: center;">
+  🔒 This feature is part of <span style="color: #d32f2f;">LiteLife Premium</span>. Coming soon!
+</div>
+        <div id="categoryButtons">
+            <button data-category="All">All</button>
+            <button data-category="First Aid">First Aid</button>
+            <button data-category="Pregnancy">Pregnancy</button>
+            <button data-category="Nutrition">Nutrition</button>
+            <button data-category="Mental Health">Mental Health</button>
+        </div>
+        <a href="favorites.html" class="favorites-link">❤Favorites</a>
+        <a href="help.html" class="favorites-link">💡Ask a Question</a>
+        <a href="suggest.html" class="favorites-link">➕Suggest a Tip</a>
+    </header>
+    <!-- Count -->
+<h2 id="tipCount">Showing 0 health tips</h2>
+  
+    <main id="tipContainer" class="grid">
+        <!--Tips will be inserted here-->
+    </main>
+    <!-- Edit Tip Modal -->
+<div id="editModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
+  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px;">
+    <h2>Edit Tip</h2>
+    <input type="text" id="editTitle" placeholder="Tip Title" style="width:100%; padding:8px;" /><br/><br/>
+    <textarea id="editContent" placeholder="Tip Content" style="width:100%; padding:8px;" rows="4"></textarea><br/><br/>
+    <select id="editCategory" style="width:100%; padding:8px;">
+      <option value="First Aid">First Aid</option>
+      <option value="Pregnancy">Pregnancy</option>
+      <option value="Nutrition">Nutrition</option>
+      <option value="Mental Health">Mental Health</option>
+    </select><br/><br/>
+    <button id="saveEditBtn" style="background:#2ecc71; color:white; padding:8px 20px; border:none; border-radius:6px;">Save Changes</button>
+    <button onclick="closeEdit()" style="margin-left:10px; background:#e74c3c; color:white; padding:8px 20px; border:none; border-radius:6px;">Cancel</button>
+  </div>
+</div>
+<!-- Daily Tip Popup -->
+<div id="dailyTipPopup" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: white; border: 2px solid #3498db; border-radius: 10px; padding: 20px; max-width: 300px; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+  <h3>💡 Daily Health Tip</h3>
+  <p id="dailyTipText"></p>
+  <button onclick="closeDailyTip()" style="margin-top: 10px; background-color: #3498db; color: white; border: none; border-radius: 6px; padding: 8px 12px;">Got it!</button>
+</div>
+<script src="themeManager.js"></script>
+<script src="data.js"></script>
+<script src="premiumManager.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

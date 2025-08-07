@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiteLife-Ask for help</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>🧠Ask for Help</h1>
+        <a href="index.html">⬅Back to home</a>
+    </header>
+    <main style="padding: 1rem;">
+      <!-- Ask Input + Mic Row -->
+<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
+  <input type="text" id="askInput" placeholder="Ask a health question..." style="flex: 1; padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc;" />
+  
+  <button id="micBtn" title="Tap to Speak" style="padding: 10px 14px; font-size: 18px; background-color: #2ecc71; color: white; border: none; border-radius: 6px;">
+    🎤
+  </button>
+</div>
+
+<!-- ASK BUTTON -->
+<div style="text-align: center; margin-bottom: 20px;">
+  <button id="askBtn" style="padding: 12px 24px; font-size: 18px; background-color: #3498db; color: white; border: none; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); cursor: pointer;">
+    🔎 Search Tips
+  </button>
+</div>
+
+<!-- Results Area -->
+<div id="askResults" class="grid"></div>
+<!-- Ask History -->
+<h3 style="margin-top: 30px;">🕘 Ask History</h3>
+<ul id="askHistory" style="list-style: none; padding: 0;"></ul>
+
+<button id="clearHistoryBtn" style="margin-top: 10px; padding: 8px 14px; border: none; border-radius: 6px; background: #e74c3c; color: white;">
+  🗑️ Clear History
+</button>
+    </main>
+    <script src="data.js"></script>
+    <script>
+       const askInput = document.getElementById("askInput");
+const micBtn = document.getElementById("micBtn");
+const askBtn = document.getElementById("askBtn");
+const askResults = document.getElementById("askResults");
+
+let allTips = [...healthTips, ...(JSON.parse(localStorage.getItem("userTips")) || [])];
+
+// 🔍 Function to filter by input (text or voice)
+function searchAskTips(query) {
+  askResults.innerHTML = "";
+  if (!query) {
+    askResults.innerHTML = "<p>Please enter or say something.</p>";
+    return;
+  }
+
+  const filtered = allTips.filter(tip =>
+    tip.title.toLowerCase().includes(query.toLowerCase()) ||
+    tip.content.toLowerCase().includes(query.toLowerCase())
+  );
+
+  if (filtered.length === 0) {
+    askResults.innerHTML = `<p>No tips found for: "${query}"</p>`;
+    return;
+  }
+
+  filtered.forEach(tip => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <h3>${tip.title}</h3>
+      <p>${tip.content}</p>
+      <small><strong>Category:</strong> ${tip.category}</small>
+    `;
+    askResults.appendChild(card);
+  });
+}
+
+// 📤 Click ASK button
+askBtn.addEventListener("click", () => {
+  searchAskTips(askInput.value.trim());
+   const query = askInput.value.trim();
+  searchAskTips(query);
+  saveAskToHistory(query);
+});
+// 💬 Press Enter triggers search
+askInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    searchAskTips(askInput.value.trim());
+     searchAskTips(query);
+    saveAskToHistory(query);
+  }
+});
+
+// 🎤 Voice-to-text using Web Speech API
+micBtn.addEventListener("click", () => {
+  if (!("webkitSpeechRecognition" in window)) {
+    alert("Voice recognition not supported on this browser.");
+    return;
+  }
+
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+
+  recognition.start();
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    askInput.value = transcript;
+    searchAskTips(transcript);
+     saveAskToHistory(transcript);
+  };
+
+  recognition.onerror = (event) => {
+    alert("Voice error: " + event.error);
+  };
+});
+function saveAskToHistory(query) {
+  if (!query) return;
+  let history = JSON.parse(localStorage.getItem("askHistory")) || [];
+  if (!history.includes(query)) {
+    history.unshift(query); // Add to top
+    localStorage.setItem("askHistory", JSON.stringify(history));
+    showAskHistory();
+  }
+}
+
+function showAskHistory() {
+  const historyList = document.getElementById("askHistory");
+  historyList.innerHTML = "";
+
+  const history = JSON.parse(localStorage.getItem("askHistory")) || [];
+  if (history.length === 0) {
+    historyList.innerHTML = "<p>No history yet.</p>";
+    return;
+  }
+
+  history.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    li.style.padding = "8px 0";
+    li.style.cursor = "pointer";
+    li.style.borderBottom = "1px solid #eee";
+
+    li.addEventListener("click", () => {
+      askInput.value = item;
+      searchAskTips(item);
+    });
+
+    historyList.appendChild(li);
+  });
+}
+
+document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+  localStorage.removeItem("askHistory");
+  showAskHistory();
+});
+    </script>
+    <script src="themeManager.js"></script>
+</body>
+</html>
