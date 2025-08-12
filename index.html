@@ -23,8 +23,6 @@
 </head>
 <body>
     <header>
-      <div style="text-align: center; margin: 10px 0;">
-  <button id="themeToggle" style="padding: 10px 20px; border-radius: 8px;">🌗 Toggle Mode</button>
 </div>
         <h1>LiteLife</h1>
         <input type="text" id="searchInput"
@@ -33,6 +31,7 @@
         <div id="premiumNotice" style="display:none; background: #fff0f0; color: #e53935; font-weight: bold; padding: 10px; border-radius: 8px; margin: 10px; text-align: center;">
   🔒 This feature is part of <span style="color: #d32f2f;">LiteLife Premium</span>. Coming soon!
 </div>
+
         <div id="categoryButtons">
             <button data-category="All">All</button>
             <button data-category="First Aid">First Aid</button>
@@ -72,6 +71,34 @@
   <p id="dailyTipText"></p>
   <button onclick="closeDailyTip()" style="margin-top: 10px; background-color: #3498db; color: white; border: none; border-radius: 6px; padding: 8px 12px;">Got it!</button>
 </div>
+<!-- Quick Action Floating Menu -->
+<div class="fab-container" id="fabContainer" aria-hidden="false">
+  <div class="fab-button" id="fabMain" title="Quick Actions">＋</div>
+
+  <div class="fab-options" id="fabOptions" aria-hidden="true">
+    <button class="fab-option" data-action="goals" title="Goals">🎯</button>
+    <button class="fab-option" data-action="theme" title="Toggle Theme">🌗</button>
+    <button class="fab-option" onclick="window.location.href='favorites.html'" title="Favorites">📌</button>
+    <button class="fab-option" data-action="search" title="Search">🔍</button>
+    <button class="fab-option" onclick="window.location.href='suggest.html'" title="Suggest a Tip">📝</button>
+    <button class="fab-option" data-action="random" title="Random Tip">🎲</button>
+  </div>
+</div>
+
+<!-- Goals Modal -->
+<div id="goalsModal" class="modal" style="display:none;">
+  <div class="modal-inner">
+    <button class="modal-close" id="closeGoalsModal">✖</button>
+    <h2>🎯 My Health Goals</h2>
+    <div class="goal-form">
+      <input id="goalTitle" type="text" placeholder="Goal title e.g., Drink 8 cups water" />
+      <input id="goalTarget" type="number" min="1" placeholder="Target (number)" />
+      <button id="addGoalBtn">Add Goal</button>
+    </div>
+    <div id="goalsList" class="goals-list"></div>
+  </div>
+</div>
+<!-- ===== end FAB + Modal ===== -->
 <script src="themeManager.js"></script>
 <script src="data.js"></script>
 <script src="premiumManager.js"></script>

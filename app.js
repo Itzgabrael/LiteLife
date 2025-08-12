@@ -1,6 +1,7 @@
 const tipContainer = document.getElementById("tipContainer");
 const searchInput = document.getElementById("searchInput");
 const categoryButtons = document.querySelectorAll("#categoryButtons button");
+const savedFavorites = JSON.parse(localStorage.getItem("favoriteCategories")) || [];
 
 let savedTips = JSON.parse(localStorage.getItem("savedTips")) || [];
 let pinnedTipId = localStorage.getItem("pinnedTipId") || null;
@@ -22,7 +23,7 @@ const allTips = [...(typeof healthTips !== "undefined" ? healthTips : []), ...us
 
 function saveToStorage() {
   localStorage.setItem("savedTips", JSON.stringify(savedTips));
-}
+} 
 
 function displayTips(tips) {
   const tipCountEl = document.getElementById("tipCount");
@@ -442,3 +443,142 @@ setInterval(() => {
 if (document.getElementById("motivationText")) {
   updateMotivationalBanner();
 }
+/* ===== BOOSTER: FAB + Goals Tracker START ===== */
+
+(function () {
+  // --- Safe DOM refs
+  const fabContainer = document.getElementById('fabContainer');
+  const fabMain = document.getElementById('fabMain');
+  const fabOptions = document.getElementById('fabOptions');
+  const options = document.querySelectorAll('.fab-option');
+
+  // Toggle FAB open/close
+  fabMain.addEventListener('click', () => {
+    fabContainer.classList.toggle('open');
+    fabOptions.setAttribute('aria-hidden', fabContainer.classList.contains('open') ? 'false' : 'true');
+  });
+
+  // ----- Goals data (localStorage)
+  let goals = JSON.parse(localStorage.getItem('healthGoals')) || [];
+
+  function saveGoals() {
+    localStorage.setItem('healthGoals', JSON.stringify(goals));
+  }
+
+  function renderGoals() {
+    const list = document.getElementById('goalsList');
+    if (!list) return;
+    list.innerHTML = '';
+    goals.forEach((g, i) => {
+      const div = document.createElement('div');
+      div.className = 'goal-item';
+      div.innerHTML = `
+        <div class="goal-info">
+          <strong>${escapeHtml(g.title)}</strong>
+          <div> ${g.progress} / ${g.target}</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${(g.target? (g.progress/g.target*100) : 0)}%"></div></div>
+        </div>
+        <div class="goal-actions">
+          <button data-action="inc" data-index="${i}">+1</button>
+          <button data-action="reset" data-index="${i}">Reset</button>
+          <button data-action="remove" data-index="${i}">❌</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // Escape to avoid injecting text
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  // Add goal UI
+  const addBtn = document.getElementById('addGoalBtn');
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      const titleInput = document.getElementById('goalTitle');
+      const targetInput = document.getElementById('goalTarget');
+      const title = titleInput.value.trim();
+      const target = parseInt(targetInput.value, 10);
+      if (!title || !target || target <= 0) return alert('Please enter a valid title and target number.');
+      goals.push({ title, target, progress: 0 });
+      titleInput.value = '';
+      targetInput.value = '';
+      saveGoals();
+      renderGoals();
+    });
+  }
+
+  // Goals action delegation
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const idx = parseInt(btn.dataset.index, 10);
+    if (Number.isNaN(idx)) return;
+    if (action === 'inc') {
+      goals[idx].progress = Math.min(goals[idx].progress + 1, goals[idx].target);
+    } else if (action === 'reset') {
+      goals[idx].progress = 0;
+    } else if (action === 'remove') {
+      goals.splice(idx, 1);
+    }
+    saveGoals();
+    renderGoals();
+  });
+
+  // Modal open/close
+  const goalsModal = document.getElementById('goalsModal');
+  const closeGoalsModal = document.getElementById('closeGoalsModal');
+  function openGoalsModal(){ if (goalsModal) { goalsModal.style.display = 'flex'; renderGoals(); } }
+  function closeGoals(){ if (goalsModal) goalsModal.style.display = 'none'; }
+
+  if (closeGoalsModal) closeGoalsModal.addEventListener('click', closeGoals);
+
+  // wire fab actions
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      const action = opt.dataset.action;
+      fabContainer.classList.remove('open'); // close menu on action
+      if (action === 'goals') {
+        openGoalsModal();
+      } else if (action === 'theme') {
+        // prefer global toggle if provided (themeManager.js)
+        if (typeof toggleTheme === 'function') toggleTheme();
+        else {
+          // fallback: simple toggle that adds/removes 'dark-mode' and persists
+          const current = localStorage.getItem('theme') || 'light';
+          const newTheme = current === 'light' ? 'dark' : 'light';
+          localStorage.setItem('theme', newTheme);
+          document.body.classList.toggle('dark-mode', newTheme === 'dark');
+        }
+      } else if (action === 'search') {
+        const si = document.getElementById('searchInput');
+        if (si) { si.focus(); si.scrollIntoView({behavior:'smooth', block:'center'}); }
+      } else if (action === 'random') {
+        // show a random tip (uses your existing tips array)
+        const combined = [...(typeof healthTips !== 'undefined' ? healthTips : []), ...userTips];
+        if (combined.length === 0) return alert('No tips available.');
+        const t = combined[Math.floor(Math.random() * combined.length)];
+        alert(`${t.title}\n\n${t.content}`);
+      }
+    });
+  });
+
+  // Close modal when clicking outside inner
+  if (goalsModal) {
+    goalsModal.addEventListener('click', (e) => {
+      if (e.target === goalsModal) closeGoals();
+    });
+  }
+
+  // init: apply theme from storage if not already applied
+  (function applySavedTheme() {
+    const saved = localStorage.getItem('theme') || 'light';
+    document.body.classList.toggle('dark-mode', saved === 'dark');
+  })();
+
+  // render initial goals if modal exists
+  if (goalsModal && goals.length) renderGoals();
+})();
+
+/* ===== BOOSTER: FAB + Goals Tracker END ===== */
