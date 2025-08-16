@@ -27,6 +27,7 @@
         <h1>LiteLife</h1>
         <input type="text" id="searchInput"
         placeholder="Search tips...">
+    <ul id="searchSuggestions"></ul>
       
         <div id="premiumNotice" style="display:none; background: #fff0f0; color: #e53935; font-weight: bold; padding: 10px; border-radius: 8px; margin: 10px; text-align: center;">
   🔒 This feature is part of <span style="color: #d32f2f;">LiteLife Premium</span>. Coming soon!
@@ -42,6 +43,7 @@
         <a href="favorites.html" class="favorites-link">❤Favorites</a>
         <a href="help.html" class="favorites-link">💡Ask a Question</a>
         <a href="suggest.html" class="favorites-link">➕Suggest a Tip</a>
+        <a href="trending.html" class="favorites-link">🔥 Trending</a>
     </header>
     <!-- Count -->
 <h2 id="tipCount">Showing 0 health tips</h2>
@@ -49,6 +51,7 @@
     <main id="tipContainer" class="grid">
         <!--Tips will be inserted here-->
     </main>
+
     <!-- Edit Tip Modal -->
 <div id="editModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
   <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px;">
@@ -77,6 +80,7 @@
 
   <div class="fab-options" id="fabOptions" aria-hidden="true">
     <button class="fab-option" data-action="goals" title="Goals">🎯</button>
+    <button class="fab-option" data-action="daily-challenge" title="Daily Challenge">🏆</button>
     <button class="fab-option" data-action="theme" title="Toggle Theme">🌗</button>
     <button class="fab-option" onclick="window.location.href='favorites.html'" title="Favorites">📌</button>
     <button class="fab-option" data-action="search" title="Search">🔍</button>
@@ -99,6 +103,15 @@
   </div>
 </div>
 <!-- ===== end FAB + Modal ===== -->
+ <!--Daily Challenge Popup-->
+ <div id="daily-challenge-popup"
+ class="daily-challenge-popup">
+<div class="popup-content">
+  <span id="close-popup">&times;</span>
+  <h3>💪Daily Challenge</h3>
+  <p id="challenge-text">Loading...</p>
+</div>
+</div>
 <script src="themeManager.js"></script>
 <script src="data.js"></script>
 <script src="premiumManager.js"></script>

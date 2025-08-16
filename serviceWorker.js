@@ -11,7 +11,8 @@ const urlsToCache= [
     'help.html',
     'suggest.html',
     'themeManager.js',
-    'premiumManager.js'
+    'premiumManager.js',
+    'trending.html'
 ];
 //Install service worker
 self.addEventListener('install', e=>{

@@ -1,5 +1,6 @@
 const tipContainer = document.getElementById("tipContainer");
 const searchInput = document.getElementById("searchInput");
+const suggestionsList = document.getElementById("searchSuggestions");
 const categoryButtons = document.querySelectorAll("#categoryButtons button");
 const savedFavorites = JSON.parse(localStorage.getItem("favoriteCategories")) || [];
 
@@ -8,6 +9,33 @@ let pinnedTipId = localStorage.getItem("pinnedTipId") || null;
 let userTips = JSON.parse(localStorage.getItem("userTips")) || [];
 let currentCategory = "All";
 let showingFavoritesOnly = false;
+
+
+// Function to display suggestions
+function showSuggestions(query) {
+  showSuggestions.innerHTML = "";
+  if (!query.trim()) return;
+
+  const matches = healthTips.filter(tip =>
+    tip.title.toLowerCase().includes(query.toLowerCase())
+  );
+
+  matches.forEach(match => {
+    const suggestion = document.createElement("div");
+    suggestion.textContent = match.title;
+    suggestion.addEventListener("click", () => {
+      searchInput.value = match.title;
+      suggestion.innerHTML = "";
+      performSearch(match.title); // Your existing search function
+    });
+
+  });
+}
+// Listen for typing in search box
+searchInput.addEventListener("input", (e) => {
+  showSuggestions(e.target.value);
+});
+
 let tipReactions = JSON.parse(localStorage.getItem("tipReactions")) || {};
 function saveReactions() {
   localStorage.setItem("tipReactions", JSON.stringify(tipReactions));
@@ -17,6 +45,8 @@ let reactedTips = JSON.parse(localStorage.getItem("reactedTips")) || {};
 function saveReactedTips() {
   localStorage.setItem("reactedTips", JSON.stringify(reactedTips));
 }
+
+
 
 // Define allTips based on hardcoded + user tips
 const allTips = [...(typeof healthTips !== "undefined" ? healthTips : []), ...userTips];
@@ -49,7 +79,7 @@ tips.forEach((tip) => {
 
     const content = document.createElement("p");
     content.textContent = tip.content;
-
+    
     const btn = document.createElement("button");
     const isSaved = savedTips.includes(tip.id);
     btn.textContent = isSaved ? "Saved ✓ (Click to Unsave)" : "Save Tip";
@@ -223,6 +253,7 @@ likeBtn.addEventListener("click", () => {
     }
     tipReactions[tip.id].likes += 1;
     reactedTips[tip.id] = "like";
+    //✅Record this as a trending interaction 
   }
 
   // 👇 Prevent going below zero
@@ -582,3 +613,60 @@ if (document.getElementById("motivationText")) {
 })();
 
 /* ===== BOOSTER: FAB + Goals Tracker END ===== */
+document.addEventListener("DOMContentLoaded", () => {
+    const dailyChallengeBtn = document.querySelector('.fab-option[data-action="daily-challenge"]');
+    const popup = document.getElementById("daily-challenge-popup");
+    const challengeText = document.getElementById("challenge-text");
+    const closePopup = document.getElementById("close-popup");
+
+    const challenges = [
+        "Drink 8 glasses of water today 💧",
+        "Walk 5,000 steps 🏃‍♂️",
+        "Do 15 push-ups 💪",
+        "Meditate for 10 minutes 🧘",
+        "Eat at least 3 servings of vegetables 🥦",
+        "Stretch for 5 minutes after waking up 🤸‍♀️",
+        "Avoid sugary drinks today 🚫🥤"
+    ];
+
+    // Show popup when button clicked
+    dailyChallengeBtn.addEventListener("click", () => {
+        const randomChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+        challengeText.textContent = randomChallenge;
+        popup.classList.add("show");
+
+        // Auto hide after 8 seconds
+        setTimeout(() => {
+            popup.classList.remove("show");
+        }, 8000);
+    });
+
+    // Close button
+    closePopup.addEventListener("click", () => {
+        popup.classList.remove("show");
+    });
+});
+function renderTrendingTips() {
+  let tips = JSON.parse(localStorage.getItem("tips")) || [];
+
+  // Calculate trending score (likes + saves + views)
+  tips.forEach(tip => {
+    tip.trendingScore = (tip.likes || 0) + (tip.saves || 0) + (tip.views || 0);
+  });
+
+  // Sort highest score first
+  tips.sort((a, b) => b.trendingScore - a.trendingScore);
+
+  let container = document.getElementById("trending-container");
+  if (!container) return;
+
+  container.innerHTML = tips.length
+    ? tips.map(tip => `
+      <div class="tip-card">
+        <h3>${tip.title}</h3>
+        <p>${tip.category}</p>
+        <small>🔥 Score: ${tip.trendingScore}</small>
+      </div>
+    `).join("")
+    : `<p>No tips available yet.</p>`;
+}
