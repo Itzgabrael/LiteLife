@@ -1,26 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trending Tips - LiteLife</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trending Tips — LiteLife</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <header>
     <h1>🔥 Trending Tips</h1>
-    <a href="index.html" class="back-btn">← Back to Home</a>
+    <a href="index.html">⬅ Back to Home</a>
   </header>
 
-  <main id="trending-container">
-    <!-- Trending tips will be injected here -->
-  </main>
+  <main id="trending-container" class="grid"></main>
 
-  <script src="app.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function(){
-      renderTrendingTips();
-    });
+    function computeTrendingScore(m){
+      if(!m) return 0;
+      const recencyBoost = Math.max(1, 1 + (Date.now() - m.lastSeenAt) / (1000*60*60*24) * (-0.05));
+      return Math.round((m.views*1 + m.likes*3 + m.saves*2) * recencyBoost);
+    }
+
+    function renderTrendingTips(){
+      const userTips = JSON.parse(localStorage.getItem("userTips")) || [];
+      const tipMetrics = JSON.parse(localStorage.getItem("tipMetrics")) || {};
+      const all = (window.healthTips || []).concat(userTips);
+
+      all.forEach(t => { t.trendingScore = computeTrendingScore(tipMetrics[t.id]); });
+      all.sort((a,b) => (b.trendingScore || 0) - (a.trendingScore || 0));
+
+      const container = document.getElementById("trending-container");
+      container.innerHTML = all.length
+        ? all.map(t => `
+          <div class="card">
+            <h2>${t.title}</h2>
+            <p>${t.content}</p>
+            <small>Category: ${t.category || "—"} • 🔥 Score: ${t.trendingScore || 0}</small>
+          </div>
+        `).join("")
+        : `<p style="padding:16px;">No tips available yet.</p>`;
+    }
   </script>
+
+  <script src="data.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", renderTrendingTips);</script>
+  <script src="themeManager.js"></script>
 </body>
 </html>

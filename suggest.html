@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suggest a Tip- LiteLife</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Suggest a Tip — LiteLife</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-    <h1>📝Suggest a Health Tip</h1>
-    <a href="index.html">⬅Back to Home</a>
-    <main style="padding: 1rem;">
-        <form id="tipForm">
-            <input type="text" id="tipTitle" placeholder="Tip Title" required /><br/><br/>
-      
-      <textarea id="tipContent" placeholder="Your health advice..." rows="4" required></textarea><br/><br/>
+  <header>
+    <h1>📝 Suggest a Health Tip</h1>
+    <a href="index.html">⬅ Back to Home</a>
+  </header>
 
+  <main style="padding: 16px;">
+    <form id="tipForm">
+      <input type="text" id="tipTitle" placeholder="Tip Title" required /><br/><br/>
+      <textarea id="tipContent" placeholder="Your health advice..." rows="4" required></textarea><br/><br/>
       <select id="tipCategory" required>
         <option value="" disabled selected>Select Category</option>
         <option value="First Aid">First Aid</option>
@@ -22,30 +23,24 @@
         <option value="Nutrition">Nutrition</option>
         <option value="Mental Health">Mental Health</option>
       </select><br/><br/>
-
-      <button type="submit" style="background:#2ecc71; color:white; padding:10px 20px; border:none; border-radius:8px;">Submit Tip</button>
+      <button type="submit" class="btn success">Submit Tip</button>
     </form>
     <p id="msg" style="margin-top:15px;"></p>
-    </main>
-     <script>
+  </main>
+
+  <script>
     const form = document.getElementById("tipForm");
-    const msg = document.getElementById("msg");
+    const msg  = document.getElementById("msg");
 
-    form.addEventListener("submit", function(e) {
+    form.addEventListener("submit", function(e){
       e.preventDefault();
-
       const title = document.getElementById("tipTitle").value.trim();
       const content = document.getElementById("tipContent").value.trim();
       const category = document.getElementById("tipCategory").value;
+      if(!title || !content || !category) return;
 
-      const newTip = {
-        id: Date.now(), // unique ID
-        title,
-        content,
-        category
-      };
+      const newTip = { id: Date.now(), title, content, category };
 
-      // Save to localStorage under userTips
       let userTips = JSON.parse(localStorage.getItem("userTips")) || [];
       userTips.push(newTip);
       localStorage.setItem("userTips", JSON.stringify(userTips));

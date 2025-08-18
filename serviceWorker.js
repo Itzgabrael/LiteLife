@@ -1,43 +1,37 @@
-const CACHE_NAME='litelife-v1';
-const urlsToCache= [
-    'index.html',
-    'style.css',
-    'app.js',
-    'data.js',
-    'manifest.json',
-    'icon-192.png',
-    'icon-512.png',
-    'favorites.html',
-    'help.html',
-    'suggest.html',
-    'themeManager.js',
-    'premiumManager.js',
-    'trending.html'
+const CACHE_NAME = "litelife-v1";
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./style.css",
+  "./app.js",
+  "./data.js",
+  "./themeManager.js",
+  "./premiumManager.js",
+  "./favorites.html",
+  "./help.html",
+  "./suggest.html",
+  "./trending.html",
+  "./manifest.json"
 ];
-//Install service worker
-self.addEventListener('install', e=>{
-    e.waitUntil(
-        caches.open(CACHE_NAME).then(cache=>{
-            return cache.addAll(urlsToCache);
-        })
-    );
+
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  );
+  self.skipWaiting();
 });
-//Activate
-self.addEventListener('activate',e=>{
-    e.waitUntil(
-        caches.keys().then(keys=>{
-            return Promise.all(
-                keys.filter(k=> k!==CACHE_NAME).map(k=>
-                    caches.delete(k))
-            );
-        })
-    );
+
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+    ))
+  );
+  self.clients.claim();
 });
-//Fetch cached files
-self.addEventListener('fetch',e=>{
-    e.respondWith(
-        caches.match(e.request).then(response=>{
-            return response||fetch(e.request);
-        })
-    );
+
+self.addEventListener("fetch", (e) => {
+  e.respondWith(
+    caches.match(e.request).then(res => res || fetch(e.request))
+  );
 });

@@ -1,120 +1,151 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiteLife- Life Tips Anytime</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <script>
-        if('serviceWorker'in navigator){
-            window.addEventListener('load',()=>{
-            navigator.serviceWorker.register('serviceWorker.js')
-            .then(()=> console.log("✅ SW registered"))
-            .catch(err=> console.log("SW failed",err));
-            });
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-   <!-- Motivational Banner -->
-<div id="motivationBanner" class="banner" data-category="mindset,nutrition,fitness,default">
-  <p id="motivationText">Loading motivation...</p>
-</div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LiteLife — Life Tips Anytime</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Font Awesome (for search/mic icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- html2canvas for “Download as Image” -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('serviceWorker.js')
+          .then(() => console.log('✅ SW registered'))
+          .catch(err => console.log('SW failed', err));
+      });
+    }
+  </script>
 </head>
 <body>
-    <header>
-</div>
-        <h1>LiteLife</h1>
-        <input type="text" id="searchInput"
-        placeholder="Search tips...">
-    <ul id="searchSuggestions"></ul>
-      
-        <div id="premiumNotice" style="display:none; background: #fff0f0; color: #e53935; font-weight: bold; padding: 10px; border-radius: 8px; margin: 10px; text-align: center;">
-  🔒 This feature is part of <span style="color: #d32f2f;">LiteLife Premium</span>. Coming soon!
-</div>
-
-        <div id="categoryButtons">
-            <button data-category="All">All</button>
-            <button data-category="First Aid">First Aid</button>
-            <button data-category="Pregnancy">Pregnancy</button>
-            <button data-category="Nutrition">Nutrition</button>
-            <button data-category="Mental Health">Mental Health</button>
-        </div>
-        <a href="favorites.html" class="favorites-link">❤Favorites</a>
-        <a href="help.html" class="favorites-link">💡Ask a Question</a>
-        <a href="suggest.html" class="favorites-link">➕Suggest a Tip</a>
-        <a href="trending.html" class="favorites-link">🔥 Trending</a>
-    </header>
-    <!-- Count -->
-<h2 id="tipCount">Showing 0 health tips</h2>
-  
-    <main id="tipContainer" class="grid">
-        <!--Tips will be inserted here-->
-    </main>
-
-    <!-- Edit Tip Modal -->
-<div id="editModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:999; justify-content:center; align-items:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px;">
-    <h2>Edit Tip</h2>
-    <input type="text" id="editTitle" placeholder="Tip Title" style="width:100%; padding:8px;" /><br/><br/>
-    <textarea id="editContent" placeholder="Tip Content" style="width:100%; padding:8px;" rows="4"></textarea><br/><br/>
-    <select id="editCategory" style="width:100%; padding:8px;">
-      <option value="First Aid">First Aid</option>
-      <option value="Pregnancy">Pregnancy</option>
-      <option value="Nutrition">Nutrition</option>
-      <option value="Mental Health">Mental Health</option>
-    </select><br/><br/>
-    <button id="saveEditBtn" style="background:#2ecc71; color:white; padding:8px 20px; border:none; border-radius:6px;">Save Changes</button>
-    <button onclick="closeEdit()" style="margin-left:10px; background:#e74c3c; color:white; padding:8px 20px; border:none; border-radius:6px;">Cancel</button>
+  <!-- Motivational Banner -->
+  <div id="motivationBanner" class="banner" data-category="mindset,nutrition,fitness,default">
+    <p id="motivationText">Loading motivation...</p>
   </div>
-</div>
-<!-- Daily Tip Popup -->
-<div id="dailyTipPopup" style="display:none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: white; border: 2px solid #3498db; border-radius: 10px; padding: 20px; max-width: 300px; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-  <h3>💡 Daily Health Tip</h3>
-  <p id="dailyTipText"></p>
-  <button onclick="closeDailyTip()" style="margin-top: 10px; background-color: #3498db; color: white; border: none; border-radius: 6px; padding: 8px 12px;">Got it!</button>
-</div>
-<!-- Quick Action Floating Menu -->
-<div class="fab-container" id="fabContainer" aria-hidden="false">
-  <div class="fab-button" id="fabMain" title="Quick Actions">＋</div>
 
-  <div class="fab-options" id="fabOptions" aria-hidden="true">
-    <button class="fab-option" data-action="goals" title="Goals">🎯</button>
-    <button class="fab-option" data-action="daily-challenge" title="Daily Challenge">🏆</button>
-    <button class="fab-option" data-action="theme" title="Toggle Theme">🌗</button>
-    <button class="fab-option" onclick="window.location.href='favorites.html'" title="Favorites">📌</button>
-    <button class="fab-option" data-action="search" title="Search">🔍</button>
-    <button class="fab-option" onclick="window.location.href='suggest.html'" title="Suggest a Tip">📝</button>
-    <button class="fab-option" data-action="random" title="Random Tip">🎲</button>
-  </div>
-</div>
-
-<!-- Goals Modal -->
-<div id="goalsModal" class="modal" style="display:none;">
-  <div class="modal-inner">
-    <button class="modal-close" id="closeGoalsModal">✖</button>
-    <h2>🎯 My Health Goals</h2>
-    <div class="goal-form">
-      <input id="goalTitle" type="text" placeholder="Goal title e.g., Drink 8 cups water" />
-      <input id="goalTarget" type="number" min="1" placeholder="Target (number)" />
-      <button id="addGoalBtn">Add Goal</button>
+  <header>
+    <!-- Theme Toggle (header) -->
+    <div class="header-actions">
+      <button id="themeToggle" class="btn small">🌗Color Scheme</button>
     </div>
-    <div id="goalsList" class="goals-list"></div>
+
+    <h1>LiteLife</h1>
+
+    <!-- Search bar (with embedded icons, your preferred markup) -->
+    <div class="container search-wrap">
+      <div class="row height d-flex justify-content-center align-items-center">
+        <div class="col-md-12">
+          <div class="form">
+            <i class="fa fa-search"></i>
+            <input type="text" id="searchInput" class="form-control form-input" placeholder="Search tips..."/>
+            <button id="homepageSearchBtn" class="left-pan" title="Search">
+              <i class="fa fa-microphone"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Premium notice -->
+    <div id="premiumNotice" class="premium-banner" style="display:none;">
+      🔒 This feature is part of <span>LiteLife Premium</span>. Coming soon!
+    </div>
+
+    <!-- Category Buttons -->
+    <div id="categoryButtons" class="chipbar">
+      <button data-category="All" class="chip active">All</button>
+      <button data-category="First Aid" class="chip">First Aid</button>
+      <button data-category="Pregnancy" class="chip">Pregnancy</button>
+      <button data-category="Nutrition" class="chip">Nutrition</button>
+      <button data-category="Mental Health" class="chip">Mental Health</button>
+    </div>
+
+    <!-- Links -->
+    <nav class="quick-links">
+      <a href="favorites.html">❤ Favorites</a>
+      <a href="help.html">💡 Ask a Question</a>
+      <a href="suggest.html">➕ Suggest a Tip</a>
+      <a href="trending.html">🔥 Trending</a>
+    </nav>
+  </header>
+
+  <!-- Count -->
+  <h2 id="tipCount" class="tip-count">Showing 0 health tips</h2>
+
+  <main id="tipContainer" class="grid">
+    <!-- Cards injected by app.js -->
+  </main>
+
+  <!-- Edit Tip Modal -->
+  <div id="editModal" class="modal-backdrop" style="display:none;">
+    <div class="modal">
+      <h2>Edit Tip</h2>
+      <input type="text" id="editTitle" placeholder="Tip Title" />
+      <textarea id="editContent" placeholder="Tip Content" rows="4"></textarea>
+      <select id="editCategory">
+        <option value="First Aid">First Aid</option>
+        <option value="Pregnancy">Pregnancy</option>
+        <option value="Nutrition">Nutrition</option>
+        <option value="Mental Health">Mental Health</option>
+      </select>
+      <div class="modal-actions">
+        <button id="saveEditBtn" class="btn success">Save Changes</button>
+        <button onclick="closeEdit()" class="btn danger">Cancel</button>
+      </div>
+    </div>
   </div>
-</div>
-<!-- ===== end FAB + Modal ===== -->
- <!--Daily Challenge Popup-->
- <div id="daily-challenge-popup"
- class="daily-challenge-popup">
-<div class="popup-content">
-  <span id="close-popup">&times;</span>
-  <h3>💪Daily Challenge</h3>
-  <p id="challenge-text">Loading...</p>
-</div>
-</div>
-<script src="themeManager.js"></script>
-<script src="data.js"></script>
-<script src="premiumManager.js"></script>
-    <script src="app.js"></script>
+
+  <!-- Daily Tip Popup -->
+  <div id="dailyTipPopup" class="tip-popup" style="display:none;">
+    <h3>💡 Daily Health Tip</h3>
+    <p id="dailyTipText"></p>
+    <button onclick="closeDailyTip()" class="btn info">Got it!</button>
+  </div>
+
+  <!-- Daily Challenge Toast -->
+  <div id="challengeToast" class="toast" aria-live="polite"></div>
+
+  <!-- Floating Action Button -->
+  <div class="fab-container" id="fab">
+    <div class="fab-options" id="fabOptions">
+      <button class="fab-option" data-action="toggle-theme" title="Toggle Theme">🌓</button>
+      <button class="fab-option" data-action="open-goals" title="Health Goals">🎯</button>
+      <button class="fab-option" data-action="daily-challenge" title="Daily Challenge">⚡</button>
+      <button class="fab-option" data-action="goto-favorites" title="Favorites">❤</button>
+      <button class="fab-option" data-action="goto-suggest" title="Suggest a Tip">➕</button>
+      <button class="fab-option" data-action="goto-help" title="Help">❓</button>
+      <button class="fab-option" data-action="goto-trending" title="Trending">🔥</button>
+    </div>
+    <button class="fab-button" id="fabBtn" aria-label="Open actions">+</button>
+  </div>
+
+  <!-- Goals Modal -->
+  <div id="goalsModal" class="modal-backdrop" style="display:none;">
+    <div class="modal">
+      <h2>🎯 Your Health Goals</h2>
+      <form id="goalsForm" class="goals-form">
+        <input type="text" id="goalTitle" placeholder="e.g., Walk 5,000 steps" />
+        <input type="number" id="goalTarget" placeholder="Target (e.g., 7 days)" />
+        <button type="submit" class="btn success">Add Goal</button>
+      </form>
+      <ul id="goalsList" class="goals-list"></ul>
+      <div class="modal-actions">
+        <button id="closeGoals" class="btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="themeManager.js"></script>
+  <script src="premiumManager.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

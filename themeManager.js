@@ -1,27 +1,30 @@
-// themeManager.js 🌗 Global theme toggle + sync
+(function(){
+  const THEME_KEY = "lite_theme"; // "light" | "dark"
 
-function applyTheme(theme) {
-  if (theme === "dark") {
-    document.body.classList.add("dark-mode");
-  } else {
-    document.body.classList.remove("dark-mode");
+  function applyTheme(theme){
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem(THEME_KEY, theme);
   }
-}
 
-function toggleTheme() {
-  const current = localStorage.getItem("theme") || "light";
-  const newTheme = current === "light" ? "dark" : "light";
-  localStorage.setItem("theme", newTheme);
-  applyTheme(newTheme);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const savedTheme = localStorage.getItem("theme") || "light";
-  applyTheme(savedTheme);
-
-  // Only work if button exists on page
-  const toggleBtn = document.getElementById("themeToggle");
-  if (toggleBtn) {
-    toggleBtn.addEventListener("click", toggleTheme);
+  function detectInitial(){
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored) return stored;
+    // system preference
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? "dark" : "light";
   }
-});
+
+  function toggle(){
+    const current = localStorage.getItem(THEME_KEY) || detectInitial();
+    applyTheme(current === "dark" ? "light" : "dark");
+  }
+
+  // Expose
+  window.ThemeManager = { toggle, applyTheme };
+
+  // Initialize
+  applyTheme(detectInitial());
+
+  // Hook header toggle button if present
+  document.getElementById("themeToggle")?.addEventListener("click", toggle);
+})();
