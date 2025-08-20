@@ -75,7 +75,7 @@ h1 { margin: 8px 0 12px; }
 .fab-container.open .fab-options { max-height: calc(70vh); } /* auto-adjust to screen height */
 .fab-option { background:#fff; border:none; padding:10px; width:44px; height:44px; border-radius:50%; box-shadow:0 4px 10px rgba(0,0,0,0.12); cursor:pointer; font-size:18px; }
 
-/* Search (your preferred style) */
+/*Search (your preferred style)*/
 .form{ position: relative; }
 .form .fa-search{ position: absolute; top:18px; left: 16px; color: #9ca3af; }
 .form .left-pan{ position: absolute; right: 10px; top: 8px; border-left: 1px solid #d1d5db; background: transparent; border: none; cursor: pointer; padding: 4px 8px; height: 40px; display: flex; align-items: center; }

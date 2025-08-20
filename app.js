@@ -1,6 +1,7 @@
 /***** DOM refs *****/
 const tipContainer = document.getElementById("tipContainer");
 const searchInput = document.getElementById("searchInput");
+const micBtn = document.getElementById("micBtn");
 const categoryButtons = document.querySelectorAll("#categoryButtons button");
 const tipCountEl = document.getElementById("tipCount");
 
@@ -13,7 +14,7 @@ let showingFavoritesOnly = false;
 
 let tipReactions = JSON.parse(localStorage.getItem("tipReactions")) || {};
 let reactedTips  = JSON.parse(localStorage.getItem("reactedTips"))  || {};
-let tipMetrics   = JSON.parse(localStorage.getItem("tipMetrics"))   || {}; // { id: {views, likes, saves, lastSeenAt} }
+let tipMetrics   = JSON.parse(localStorage.getItem("tipMetrics"))   || {}; 
 
 /***** Helpers *****/
 function saveReactions(){ localStorage.setItem("tipReactions", JSON.stringify(tipReactions)); }
@@ -305,17 +306,6 @@ categoryButtons.forEach(btn => {
   });
 });
 
-/***** Search wiring (icon/mic button just triggers search focus or voice stub) *****/
-const homepageSearchBtn = document.getElementById("homepageSearchBtn");
-if (homepageSearchBtn) {
-  homepageSearchBtn.addEventListener("click", () => {
-    // For now, just focus input; you can hook Web Speech later.
-    searchInput?.focus();
-    applyFilters();
-  });
-}
-searchInput?.addEventListener("input", applyFilters);
-
 /***** Daily Tip *****/
 function showDailyTip(){
   const today = new Date().toISOString().slice(0,10);
@@ -503,3 +493,29 @@ window.addEventListener("load", () => {
   showDailyTip();
   applyFilters();
 });
+// Voice search (mic button)
+if ('webkitSpeechRecognition' in window) {
+  const recognition = new webkitSpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = "en-US";
+
+  micBtn.addEventListener("click", () => {
+    recognition.start();
+  });
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    searchInput.value = transcript;
+
+    // ✅ trigger same filtering/search logic
+    const searchEvent = new Event("input", { bubbles: true });
+    searchInput.dispatchEvent(searchEvent);
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Speech recognition error:", event.error);
+  };
+} else {
+  console.warn("Speech recognition not supported in this browser.");
+}
