@@ -493,29 +493,33 @@ window.addEventListener("load", () => {
   showDailyTip();
   applyFilters();
 });
-// Voice search (mic button)
-if ('webkitSpeechRecognition' in window) {
-  const recognition = new webkitSpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = false;
+// ✅ Use Web Speech API
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+  const recognition = new SpeechRecognition();
   recognition.lang = "en-US";
+  recognition.interimResults = false;
 
   micBtn.addEventListener("click", () => {
     recognition.start();
   });
 
-  recognition.onresult = (event) => {
+  recognition.addEventListener("result", (event) => {
     const transcript = event.results[0][0].transcript;
-    searchInput.value = transcript;
-
-    // ✅ trigger same filtering/search logic
-    const searchEvent = new Event("input", { bubbles: true });
-    searchInput.dispatchEvent(searchEvent);
-  };
-
-  recognition.onerror = (event) => {
-    console.error("Speech recognition error:", event.error);
-  };
+    searchInput.value = transcript;   // Fill search box
+    filterTips(transcript);           // ✅ Run filtering immediately
+  });
 } else {
   console.warn("Speech recognition not supported in this browser.");
 }
+function filterTips(keyword) {
+  if (!keyword) {
+    applyFilters(); // Reset to all tips
+    return;
+  }
+  searchInput.value = keyword; // Update input box
+  applyFilters();              // Apply filters with new keyword
+}
+searchInput.addEventListener("input", () => {
+  applyFilters();
+});
